@@ -1,3 +1,6 @@
+#include <SoftwareSerial.h>
+
+
 // 0x80 beginning 
 //___________________
 // 0x81 - 112 bytes / no refresh / C+3E
@@ -36,7 +39,8 @@ byte dot6 = 64;
 byte all = 127;
 byte testpattern1 = dot1 | dot3 | dot5;
 byte testpattern2 = ~testpattern1;
-
+byte* buildFlippyDottys(byte address, bool meh);
+  
 // dark / bright transmissions for configurations above
 
 byte all_bright_2C[]= {0x80, 0x83, 0x02, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x8F};
@@ -65,18 +69,25 @@ byte* buildFlippyDottys(byte address, bool meh) {
   return fun;
 }
 
+
+int delayms = 2000;
+int minrefresh = 120;
+
+SoftwareSerial softSerial(8, 9);
+
 void setup() {
   Serial.begin(57600);
+  softSerial.begin(57600);
 }
 
 
 
 void loop() {
 
-  Serial.write(funpattern1, 32); 
-  Serial.write(funpattern2, 32); 
-   delay (120);
-  Serial.write(funpattern1a, 32);
-  Serial.write(funpattern2a, 32);
-   delay (120);
+  softSerial.write(funpattern2, 32);
+  softSerial.write(funpattern1, 32); 
+   delay (minrefresh);
+  softSerial.write(funpattern2a, 32);
+  softSerial.write(funpattern1a, 32);
+   delay (delayms);
 } 
