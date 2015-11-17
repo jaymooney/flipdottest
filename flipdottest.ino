@@ -39,23 +39,20 @@ byte dot6 = 64;
 byte all = 127;
 byte testpattern1 = dot1 | dot3 | dot5;
 byte testpattern2 = ~testpattern1;
-byte* buildFlippyDottys(byte address, bool meh);
   
 // dark / bright transmissions for configurations above
 
-byte all_bright_2C[]= {0x80, 0x83, 0x02, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x8F};
-
-byte all_dark_2C[]= {0x80, 0x83, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x8F};
-
-
-byte* funpattern1 = buildFlippyDottys(1, false);
-byte* funpattern1a = buildFlippyDottys(1, true);
-byte* funpattern2 = buildFlippyDottys(2, true);
-byte* funpattern2a = buildFlippyDottys(2, false);
-
-byte all_bright_01[]= {0x80, 0x83, 0x01, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x8F};
-
-byte all_dark_01[]= {0x80, 0x83, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x8F};
+byte* buildSolid(byte address, bool meh) {
+  byte* fun = (byte*) malloc(sizeof(byte) * 32);
+  fun[0] = 0x80;
+  fun[1] = 0x83;
+  fun[2] = address;
+  for (int i = 3; i < 31; i++) {
+    fun[i] = meh ? all : 0;
+  }
+  fun[31] = 0x8f;
+  return fun;
+}
 
 byte* buildFlippyDottys(byte address, bool meh) {
   byte* fun = (byte*) malloc(sizeof(byte) * 32);
@@ -70,24 +67,58 @@ byte* buildFlippyDottys(byte address, bool meh) {
 }
 
 
+
+byte* all_dark_01 = buildSolid(1, false);
+byte* all_dark_02 = buildSolid(2, false);
+byte* all_bright_01 = buildSolid(1, true);
+byte* all_bright_02 = buildSolid(2, true);
+
+byte* funpattern1 = buildFlippyDottys(1, false);
+byte* funpattern1a = buildFlippyDottys(1, true);
+byte* funpattern2 = buildFlippyDottys(2, true);
+byte* funpattern2a = buildFlippyDottys(2, false);
+
+
+
 int delayms = 2000;
 int minrefresh = 120;
+int bah = 50;
 
 SoftwareSerial softSerial(8, 9);
 
 void setup() {
-  Serial.begin(57600);
+  //Serial.begin(57600);
   softSerial.begin(57600);
 }
 
 
 
 void loop() {
-
-  softSerial.write(funpattern2, 32);
-  softSerial.write(funpattern1, 32); 
-   delay (minrefresh);
-  softSerial.write(funpattern2a, 32);
-  softSerial.write(funpattern1a, 32);
-   delay (delayms);
+  thing2();
 } 
+
+void thing1() {
+  softSerial.write(all_bright_01, 32); 
+  softSerial.write(all_bright_02, 32);
+   delay (minrefresh);
+  softSerial.write(funpattern1a, 32);
+  softSerial.write(funpattern2a, 32);
+   delay (minrefresh);
+}
+void thing2() {
+  
+   delay (delayms);
+  softSerial.write(all_bright_01, 32); 
+  softSerial.write(all_bright_02, 32);
+   delay (minrefresh);
+  softSerial.write(funpattern1, 32); 
+  softSerial.write(funpattern2, 32);
+   delay (delayms);
+  softSerial.write(all_dark_01, 32); 
+  softSerial.write(all_dark_02, 32);
+   delay (minrefresh);
+  softSerial.write(funpattern1a, 32);
+  softSerial.write(funpattern2a, 32);
+   delay (minrefresh);
+}
+
