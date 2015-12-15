@@ -55,7 +55,7 @@ byte* buildSolid(byte address, bool meh) {
 }
 
 byte* buildFlippyDottys(byte address, bool meh) {
-  byte* fun = (byte*) malloc(sizeof(byte) * 32);
+  byte* fun = new byte[32];
   fun[0] = 0x80;
   fun[1] = 0x83;
   fun[2] = address;
@@ -68,20 +68,23 @@ byte* buildFlippyDottys(byte address, bool meh) {
 
 
 
-byte* all_dark_01 = buildSolid(1, false);
+byte* all_dark_01 = buildSolid(0, false);
 byte* all_dark_02 = buildSolid(2, false);
-byte* all_bright_01 = buildSolid(1, true);
+byte* all_bright_01 = buildSolid(0, true);
 byte* all_bright_02 = buildSolid(2, true);
 
-byte* funpattern1 = buildFlippyDottys(1, false);
-byte* funpattern1a = buildFlippyDottys(1, true);
+byte test01[32] = {0x80, 0x83, 0, 0, 0, 56, 8, 120, 8, 56, 0, 64, 32, 32, 32, 32, 64, 0, 0, 64, 32, 32, 32, 32, 0, 0, 32, 112, 32, 32, 0, 0x8f};
+byte test02[32] = {0x80, 0x83, 2, 0, 0, 0, 4, 7, 4, 0, 0, 3, 5, 5, 5, 5, 0, 0, 0, 4, 5, 5, 5, 2, 0, 0, 0, 7, 4, 4, 0, 0x8f};
+
+byte* funpattern1 = buildFlippyDottys(0, false);
+byte* funpattern1a = buildFlippyDottys(0, true);
 byte* funpattern2 = buildFlippyDottys(2, true);
 byte* funpattern2a = buildFlippyDottys(2, false);
 
 
 
-int delayms = 2000;
-int minrefresh = 120;
+int delayms = 100;
+int minrefresh = 100;
 int bah = 50;
 
 SoftwareSerial softSerial(8, 9);
@@ -111,6 +114,9 @@ void thing2() {
   softSerial.write(all_bright_01, 32); 
   softSerial.write(all_bright_02, 32);
    delay (minrefresh);
+  softSerial.write(test01, 32); 
+  softSerial.write(test02, 32);
+   delay (minrefresh);
   softSerial.write(funpattern1, 32); 
   softSerial.write(funpattern2, 32);
    delay (delayms);
@@ -119,6 +125,5 @@ void thing2() {
    delay (minrefresh);
   softSerial.write(funpattern1a, 32);
   softSerial.write(funpattern2a, 32);
-   delay (minrefresh);
 }
 
